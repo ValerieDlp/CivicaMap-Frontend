@@ -1,0 +1,14 @@
+*.log
+.DS_Store
+/.env*
+!/.env.example
+/node_modules
+/dist
+/public/build
+/public/hot
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+Thumbs.db

@@ -1,11 +1,24 @@
 import './bootstrap';
 import '../css/app.css';
 import { getApiErrorMessage, RecursosService } from './services/recursosService.js';
+<<<<<<< HEAD
 
 const app = document.querySelector('#app');
 const API = window.axios;
 const TOKEN_KEY = 'civicamap_token';
 let currentUser = null;
+=======
+import { AuthService } from './services/authService.js';
+import { ADMIN_LOGIN_ROUTE, SessionService } from './services/sessionService.js';
+
+const app = document.querySelector('#app');
+const API = window.axios;
+// Usuario CLIENTE autenticado (las vistas de cliente lo usan). La sesión administrativa se consulta con SessionService.isAdmin().
+let currentUser = null;
+const syncCurrentUser = () => {
+    currentUser = SessionService.isAuthenticated() && !SessionService.isAdmin() ? SessionService.getUser() : null;
+};
+>>>>>>> origin/main
 const IMAGE_PLACEHOLDER = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22450%22 viewBox=%220 0 800 450%22%3E%3Crect width=%22800%22 height=%22450%22 fill=%22%23e9ecef%22/%3E%3Cpath d=%22M0 360l190-170 130 120 130-150 350 290H0z%22 fill=%22%23ced4da%22/%3E%3Ccircle cx=%22590%22 cy=%22125%22 r=%2240%22 fill=%22%23ced4da%22/%3E%3Ctext x=%22400%22 y=%22420%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2224%22 fill=%22%236c757d%22%3EImagen no disponible%3C/text%3E%3C/svg%3E';
 
 const escapeHtml = (value = '') =>
@@ -57,7 +70,44 @@ const pageTitle = (eyebrow, title, description = '') => `
         ${description ? `<p class="text-secondary">${escapeHtml(description)}</p>` : ''}
     </div>`;
 
+<<<<<<< HEAD
 const header = () => `
+=======
+const adminHeader = () => {
+    const user = SessionService.getUser();
+    const links = [
+        ['admin/dashboard', 'bi-speedometer2', 'Dashboard'],
+        ['admin/reportes', 'bi-file-earmark-text', 'Reportes'],
+    ];
+
+    return `
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm" data-admin-navbar>
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#/admin/dashboard">
+                <span class="brand-icon"><i class="bi bi-shield-lock-fill"></i></span>CivicaMap <span class="badge text-bg-warning ms-2">Admin</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto align-items-lg-center gap-lg-1">
+                    ${links.map(([path, icon, label]) => `<li class="nav-item"><a class="nav-link${route() === path ? ' active' : ''}" href="#/${path}"><i class="bi ${icon} me-1"></i>${label}</a></li>`).join('')}
+                    <li class="nav-item"><a class="nav-link" href="#/inicio"><i class="bi bi-box-arrow-up-right me-1"></i>Sitio público</a></li>
+                </ul>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="navbar-text text-white" data-admin-user>
+                        <i class="bi bi-person-circle me-1"></i>${escapeHtml(user?.nombre || 'Administrador')}
+                        <span class="badge text-bg-warning ms-1">${escapeHtml((user?.roles || []).join(', '))}</span>
+                    </span>
+                    <button class="btn btn-outline-light" data-action="logout"><i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    </nav>`;
+};
+
+const publicHeader = () => `
+>>>>>>> origin/main
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#/inicio">
@@ -71,7 +121,14 @@ const header = () => `
                     <li class="nav-item"><a class="nav-link" href="#/mapa"><i class="bi bi-geo-alt me-1"></i>Reportes</a></li>
                     <li class="nav-item"><a class="nav-link" href="#/denuncias"><i class="bi bi-megaphone me-1"></i>Nuevo reporte</a></li>
                     <li class="nav-item"><a class="nav-link" href="#/servicios"><i class="bi bi-grid me-1"></i>Servicios</a></li>
+<<<<<<< HEAD
                     ${currentUser ? `
+=======
+                    ${SessionService.isAdmin() ? `
+                        <li class="nav-item"><a class="nav-link" href="#/admin/dashboard"><i class="bi bi-shield-lock me-1"></i>Panel administrativo</a></li>
+                        <li class="nav-item ms-lg-2"><button class="btn btn-outline-light" data-action="logout"><i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión</button></li>
+                    ` : currentUser ? `
+>>>>>>> origin/main
                         <li class="nav-item"><a class="nav-link" href="#/perfil"><i class="bi bi-person me-1"></i>Mi perfil</a></li>
                         <li class="nav-item"><a class="nav-link" href="#/solicitudes"><i class="bi bi-card-checklist me-1"></i>Mis solicitudes</a></li>
                         <li class="nav-item ms-lg-2"><button class="btn btn-outline-light" data-action="logout"><i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión</button></li>
@@ -84,11 +141,22 @@ const header = () => `
         </div>
     </nav>`;
 
+<<<<<<< HEAD
+=======
+const isAdminArea = (name = route()) => name === 'admin' || name.startsWith('admin/');
+
+const header = () => (SessionService.isAdmin() && isAdminArea() ? adminHeader() : publicHeader());
+
+>>>>>>> origin/main
 const footer = () => `
     <footer class="footer mt-5 py-4">
         <div class="container d-flex flex-wrap justify-content-between gap-2">
             <span><i class="bi bi-map-fill me-2"></i>CivicaMap</span>
+<<<<<<< HEAD
             <span class="small">Proyecto académico · ODS 16</span>
+=======
+            <span class="small">Proyecto académico · ODS 16 · <a class="link-light" href="#/admin/login">Acceso administrativo</a></span>
+>>>>>>> origin/main
         </div>
     </footer>`;
 
@@ -140,13 +208,21 @@ const homePage = () => {
         </section>`);
 };
 
+<<<<<<< HEAD
 const reportCard = (report) => {
+=======
+const reportCard = (report, admin = false) => {
+>>>>>>> origin/main
     const category = report.categoria?.nombre || 'Sin categoría';
     const author = report.anonimizado ? 'Anónimo' : (report.usuario?.nombre || 'No disponible');
     const image = report.evidencias?.[0]?.url;
     const coordinates = [report.latitud_aprox, report.longitud_aprox].filter((value) => value !== null && value !== undefined && value !== '').join(', ');
 
+<<<<<<< HEAD
     return `<a class="resource-card-link" href="#/reportes/${encodeURIComponent(report.id_reporte)}" aria-label="Ver detalle del reporte ${escapeHtml(report.id_reporte)}">
+=======
+    return `<a class="resource-card-link" href="#/${admin ? 'admin/' : ''}reportes/${encodeURIComponent(report.id_reporte)}" aria-label="Ver detalle del reporte ${escapeHtml(report.id_reporte)}">
+>>>>>>> origin/main
         <article class="card resource-card shadow-sm h-100">
             <img class="resource-card-image" data-fallback src="${escapeHtml(image || IMAGE_PLACEHOLDER)}" alt="${image ? `Evidencia del reporte ${escapeHtml(report.id_reporte)}` : 'Imagen no disponible'}" loading="lazy">
             <div class="card-body d-flex flex-column">
@@ -166,6 +242,7 @@ const reportCard = (report) => {
     </a>`;
 };
 
+<<<<<<< HEAD
 const reportsPage = async () => {
     layout(`<div class="container py-5">${pageTitle('CivicaMap', 'Reportes ciudadanos', 'Consulta reportes de tu comunidad.') }<div id="page-content">${loadingIndicator('Cargando reportes...')}</div></div>`);
     const container = app.querySelector('#page-content');
@@ -176,6 +253,20 @@ const reportsPage = async () => {
         try {
             const categoriesResponse = await API.get('/categorias');
             categories = envelopeData(categoriesResponse) || [];
+=======
+const reportsView = async (admin = false) => {
+    const scope = admin ? 'admin' : 'public';
+    layout(`<div class="container py-5">${admin
+        ? pageTitle('Panel administrativo', 'Gestión de reportes', 'Reportes consultados con tu token de administrador.')
+        : pageTitle('CivicaMap', 'Reportes ciudadanos', 'Consulta reportes de tu comunidad.')}<div id="page-content">${loadingIndicator('Cargando reportes...')}</div></div>`);
+    const container = app.querySelector('#page-content');
+
+    try {
+        const reports = await RecursosService.getRecursos(scope);
+        let categories = [];
+        try {
+            categories = (await RecursosService.getCategorias(scope)) || [];
+>>>>>>> origin/main
         } catch (error) {
             console.error('No se pudieron cargar las categorías de reportes.', error);
         }
@@ -187,7 +278,11 @@ const reportsPage = async () => {
 
         container.innerHTML = `
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<<<<<<< HEAD
                 <p class="text-secondary mb-0">Reportes consultados desde la API.</p>
+=======
+                <p class="text-secondary mb-0">${admin ? 'Datos protegidos por auth:sanctum.' : 'Reportes consultados desde la API.'}</p>
+>>>>>>> origin/main
                 <select id="category-filter" class="form-select w-auto" aria-label="Filtrar por categoría">
                     <option value="">Todas las categorías</option>
                     ${categories.map((category) => `<option value="${escapeHtml(category.id_categoria)}">${escapeHtml(category.nombre)}</option>`).join('')}
@@ -200,7 +295,11 @@ const reportsPage = async () => {
         const renderReports = () => {
             const filtered = reports.filter((report) => !filter.value || String(report.id_categoria) === filter.value);
             list.innerHTML = filtered.length
+<<<<<<< HEAD
                 ? filtered.map((report) => `<div class="col-sm-6 col-xl-4">${reportCard(report)}</div>`).join('')
+=======
+                ? filtered.map((report) => `<div class="col-sm-6 col-xl-4">${reportCard(report, admin)}</div>`).join('')
+>>>>>>> origin/main
                 : '<div class="col-12"><div class="empty-state"><p class="text-secondary mb-0">No hay reportes en esta categoría.</p></div></div>';
             bindImageFallbacks(list);
         };
@@ -212,12 +311,21 @@ const reportsPage = async () => {
     }
 };
 
+<<<<<<< HEAD
 const resourceDetailPage = async (id) => {
     layout(`<div class="container py-5"><a href="#/mapa" class="btn btn-link px-0 mb-3"><i class="bi bi-arrow-left me-1"></i>Volver a reportes</a><div id="page-content">${loadingIndicator('Cargando detalle del reporte...')}</div></div>`);
     const container = app.querySelector('#page-content');
 
     try {
         const report = await RecursosService.getRecursoById(id);
+=======
+const resourceDetailPage = async (id, admin = false) => {
+    layout(`<div class="container py-5"><a href="${admin ? '#/admin/reportes' : '#/mapa'}" class="btn btn-link px-0 mb-3"><i class="bi bi-arrow-left me-1"></i>Volver a reportes</a><div id="page-content">${loadingIndicator('Cargando detalle del reporte...')}</div></div>`);
+    const container = app.querySelector('#page-content');
+
+    try {
+        const report = await RecursosService.getRecursoById(id, admin ? 'admin' : 'public');
+>>>>>>> origin/main
         const category = report.categoria?.nombre || 'Sin categoría';
         const author = report.anonimizado ? 'Anónimo' : (report.usuario?.nombre || 'No disponible');
         const coordinates = [report.latitud_aprox, report.longitud_aprox].filter((value) => value !== null && value !== undefined && value !== '').join(', ');
@@ -382,6 +490,10 @@ const servicesPage = requestPage('Servicios comunitarios', async (container) => 
 });
 
 const authPage = (register = false) => {
+<<<<<<< HEAD
+=======
+    const flash = register ? null : SessionService.consumeFlash();
+>>>>>>> origin/main
     const title = register ? 'Crear cuenta' : 'Iniciar sesión';
     const fields = register ? `
         <div class="mb-3"><label for="nombre" class="form-label fw-semibold">Nombre</label><input id="nombre" name="nombre" type="text" class="form-control" maxlength="100" autocomplete="name" required></div>
@@ -395,7 +507,11 @@ const authPage = (register = false) => {
 
     layout(`<div class="container py-5"><div class="auth-card"><div class="card shadow-sm p-4 p-lg-5">
         ${pageTitle(register ? 'Registro' : 'Cuenta', title, register ? 'Regístrate para participar en CivicaMap.' : 'Accede a tu cuenta de CivicaMap.')}
+<<<<<<< HEAD
         <div id="auth-alert"></div><form id="auth-form">${fields}
+=======
+        <div id="auth-alert">${flash ? alertBox(flash.message, flash.type) : ''}</div><form id="auth-form">${fields}
+>>>>>>> origin/main
             ${register ? '<div class="form-check mb-4"><input class="form-check-input" type="checkbox" id="privacy" required><label class="form-check-label" for="privacy">Acepto el uso responsable de la plataforma.</label></div>' : ''}
             <button type="submit" class="btn ${register ? 'btn-success' : 'btn-primary'} btn-lg w-100">${register ? 'Crear cuenta' : 'Iniciar sesión'}</button>
         </form>
@@ -430,8 +546,13 @@ const authPage = (register = false) => {
             }
 
             const data = envelopeData(response);
+<<<<<<< HEAD
             sessionStorage.setItem(TOKEN_KEY, data.token);
             currentUser = data.usuario;
+=======
+            SessionService.save(data);
+            syncCurrentUser();
+>>>>>>> origin/main
             navigate('perfil');
         } catch (error) {
             alert.innerHTML = alertBox(apiErrorMessage(error));
@@ -463,6 +584,10 @@ const profilePage = async () => {
     try {
         const response = await API.get('/client/perfil');
         currentUser = envelopeData(response);
+<<<<<<< HEAD
+=======
+        SessionService.updateUser(currentUser);
+>>>>>>> origin/main
         form.elements.nombre.value = currentUser.nombre || '';
         form.elements.correo.value = currentUser.correo || '';
     } catch (error) {
@@ -481,6 +606,10 @@ const profilePage = async () => {
         try {
             const response = await API.patch('/client/perfil', payload);
             currentUser = envelopeData(response);
+<<<<<<< HEAD
+=======
+            SessionService.updateUser(currentUser);
+>>>>>>> origin/main
             form.elements.password.value = '';
             alert.innerHTML = alertBox('Perfil actualizado correctamente.', 'success');
         } catch (error) {
@@ -522,9 +651,120 @@ const requestsPage = requestPage('Mis solicitudes', async (container) => {
     });
 });
 
+<<<<<<< HEAD
 const logout = async () => {
     try {
         await API.post('/client/logout');
+=======
+// ---------------------------------------------------------------------------
+// Área administrativa (Actividad 5.2)
+// ---------------------------------------------------------------------------
+const adminLoginPage = () => {
+    const flash = SessionService.consumeFlash();
+
+    layout(`<div class="container py-5"><div class="auth-card"><div class="card shadow-sm p-4 p-lg-5">
+        <div class="text-center mb-4">
+            <div class="feature-icon bg-primary-subtle text-primary mx-auto mb-3"><i class="bi bi-shield-lock"></i></div>
+            <h1 class="h2 fw-bold">Acceso administrativo</h1>
+            <p class="text-secondary">Inicia sesión con tu cuenta de administrador.</p>
+        </div>
+        <div id="auth-alert" role="status">${flash ? alertBox(flash.message, flash.type) : ''}</div>
+        <form id="admin-login-form" novalidate>
+            <div class="mb-3"><label for="correo" class="form-label fw-semibold">Correo electrónico</label><input id="correo" name="correo" type="email" class="form-control form-control-lg" maxlength="150" autocomplete="username" required autofocus></div>
+            <div class="mb-4"><label for="password" class="form-label fw-semibold">Contraseña</label><input id="password" name="password" type="password" class="form-control form-control-lg" autocomplete="current-password" required></div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">Iniciar sesión</button>
+        </form>
+        <div class="text-center mt-4"><a href="#/inicio"><i class="bi bi-arrow-left me-1"></i>Volver al sitio público</a></div>
+    </div></div></div>`);
+
+    const form = app.querySelector('#admin-login-form');
+    const alert = app.querySelector('#auth-alert');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        alert.innerHTML = '';
+
+        try {
+            const usuario = await AuthService.adminLogin(form.elements.correo.value.trim(), form.elements.password.value);
+            SessionService.setFlash(`¡Bienvenido, ${usuario.nombre}! Sesión iniciada correctamente.`, 'success');
+            SessionService.redirect('/admin/dashboard');
+        } catch (error) {
+            alert.innerHTML = alertBox(apiErrorMessage(error));
+            form.elements.password.value = '';
+            button.disabled = false;
+        }
+    });
+};
+
+const statCard = (icon, label, value, tone = 'primary') => `
+    <div class="col-sm-6 col-xl-3"><div class="card shadow-sm h-100 p-4">
+        <div class="feature-icon bg-${tone}-subtle text-${tone} mb-3"><i class="bi ${icon}"></i></div>
+        <div class="display-6 fw-bold" data-stat="${escapeHtml(label)}">${escapeHtml(value)}</div>
+        <div class="text-secondary">${escapeHtml(label)}</div>
+    </div></div>`;
+
+const adminDashboardPage = async () => {
+    const user = SessionService.getUser();
+    const flash = SessionService.consumeFlash();
+
+    layout(`<div class="container py-5">
+        ${flash ? alertBox(flash.message, flash.type) : ''}
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <span class="badge text-bg-primary mb-2">Panel administrativo</span>
+                <h1 class="fw-bold mb-1" id="admin-welcome">Bienvenido, ${escapeHtml(user?.nombre || 'Administrador')}</h1>
+                <p class="text-secondary mb-0"><i class="bi bi-envelope me-1"></i>${escapeHtml(user?.correo || '')}
+                    <span class="badge text-bg-warning ms-2">${escapeHtml((user?.roles || []).join(', '))}</span></p>
+            </div>
+            <a class="btn btn-primary" href="#/admin/reportes"><i class="bi bi-file-earmark-text me-2"></i>Gestionar reportes</a>
+        </div>
+        <div id="page-content">${loadingIndicator('Cargando indicadores...')}</div>
+    </div>`);
+    const container = app.querySelector('#page-content');
+
+    try {
+        const [reports, categories] = await Promise.all([
+            RecursosService.getRecursos('admin'),
+            RecursosService.getCategorias('admin'),
+        ]);
+        const byStatus = reports.reduce((totals, report) => {
+            const status = String(report.estado || 'sin estado').toLowerCase();
+            totals[status] = (totals[status] || 0) + 1;
+            return totals;
+        }, {});
+        const evidences = reports.reduce((total, report) => total + (report.evidencias?.length || 0), 0);
+
+        container.innerHTML = `
+            <div class="row g-4 mb-4">
+                ${statCard('bi-file-earmark-text', 'Reportes', reports.length)}
+                ${statCard('bi-tags', 'Categorías', categories.length, 'success')}
+                ${statCard('bi-images', 'Evidencias', evidences, 'danger')}
+                ${statCard('bi-hourglass-split', 'Pendientes', byStatus.pendiente || 0, 'warning')}
+            </div>
+            <div class="card shadow-sm p-4"><h2 class="h5">Reportes por estado</h2>
+                ${Object.keys(byStatus).length
+                    ? `<ul class="mb-0">${Object.entries(byStatus).map(([status, total]) => `<li class="text-capitalize">${escapeHtml(status)}: <strong>${total}</strong></li>`).join('')}</ul>`
+                    : '<p class="text-secondary mb-0">Aún no hay reportes registrados.</p>'}
+            </div>`;
+    } catch (error) {
+        container.innerHTML = alertBox(apiErrorMessage(error));
+    }
+};
+
+const logout = async () => {
+    // Sesión administrativa: POST /admin/logout (revoca el token), limpia sessionStorage y redirige al Login
+    if (SessionService.isAdmin()) {
+        await AuthService.adminLogout();
+        return;
+    }
+
+    try {
+        await API.post('/client/logout', null, { skipAuthHandler: true });
+>>>>>>> origin/main
     } catch (error) {
         if (error.response?.status !== 401) {
             window.alert(apiErrorMessage(error));
@@ -532,15 +772,64 @@ const logout = async () => {
         }
     }
 
+<<<<<<< HEAD
     sessionStorage.removeItem(TOKEN_KEY);
+=======
+    SessionService.clear();
+>>>>>>> origin/main
     currentUser = null;
     navigate('inicio');
 };
 
+<<<<<<< HEAD
 const render = async () => {
     const currentRoute = route();
 
     try {
+=======
+/**
+ * GUARDIA DE RUTAS (equivalente a CanActivate): se evalúa antes de pintar cualquier vista.
+ * Devuelve true si la navegación puede continuar; si no, redirige y devuelve false.
+ *  - Todo lo que cuelga de #/admin/... (excepto el login) exige sesión de administrador.
+ *  - El login administrativo no se muestra a quien ya tiene sesión (va al dashboard).
+ * El login no está protegido, por lo que nunca se generan bucles de redirección.
+ */
+const canActivate = (name) => {
+    if (name === 'admin/login') {
+        if (SessionService.isAdmin()) {
+            SessionService.redirect('/admin/dashboard');
+            return false;
+        }
+        return true;
+    }
+
+    if (isAdminArea(name) && !SessionService.isAdmin()) {
+        // Resto de sesión incompleta (p. ej. token borrado a mano): se elimina por completo
+        if (!SessionService.isAuthenticated()) SessionService.clear();
+        if (!SessionService.hasFlash()) {
+            SessionService.setFlash('Debes iniciar sesión como administrador para acceder a esa sección.', 'warning');
+        }
+        SessionService.redirect(ADMIN_LOGIN_ROUTE);
+        return false;
+    }
+
+    return true;
+};
+
+const render = async () => {
+    const currentRoute = route();
+    syncCurrentUser();
+
+    if (!canActivate(currentRoute)) return;
+
+    try {
+        const adminDetailMatch = currentRoute.match(/^admin\/reportes\/([^/]+)$/);
+        if (adminDetailMatch) {
+            await resourceDetailPage(decodeURIComponent(adminDetailMatch[1]), true);
+            return;
+        }
+
+>>>>>>> origin/main
         const detailMatch = currentRoute.match(/^reportes\/([^/]+)$/);
         if (detailMatch) {
             await resourceDetailPage(decodeURIComponent(detailMatch[1]));
@@ -549,8 +838,16 @@ const render = async () => {
 
         const pages = {
             inicio: homePage,
+<<<<<<< HEAD
             mapa: reportsPage,
             reportes: reportsPage,
+=======
+            mapa: () => reportsView(false),
+            reportes: () => reportsView(false),
+            'admin/login': adminLoginPage,
+            'admin/dashboard': adminDashboardPage,
+            'admin/reportes': () => reportsView(true),
+>>>>>>> origin/main
             denuncias: reportFormPage,
             servicios: servicesPage,
             login: () => authPage(false),
@@ -558,12 +855,18 @@ const render = async () => {
             perfil: profilePage,
             solicitudes: requestsPage,
         };
+<<<<<<< HEAD
         await (pages[currentRoute] || homePage)();
+=======
+        // Cualquier otra URL administrativa desconocida cae en el dashboard (ya validado por el guard)
+        await (pages[currentRoute] || (isAdminArea(currentRoute) ? adminDashboardPage : homePage))();
+>>>>>>> origin/main
     } catch (error) {
         layout(`<div class="container py-5">${alertBox(apiErrorMessage(error))}<a href="#/inicio" class="btn btn-primary">Volver al inicio</a></div>`);
     }
 };
 
+<<<<<<< HEAD
 const restoreSession = async () => {
     if (!sessionStorage.getItem(TOKEN_KEY)) return;
 
@@ -573,6 +876,31 @@ const restoreSession = async () => {
     } catch (error) {
         if (error.response?.status === 401) {
             sessionStorage.removeItem(TOKEN_KEY);
+=======
+/**
+ * Al cargar/recargar la página valida contra la API que el token guardado siga vigente.
+ * Si el token falta, está vencido, fue revocado o alterado, la sesión se destruye y el
+ * guard envía al Login cuando se intenta entrar al área administrativa.
+ */
+const restoreSession = async () => {
+    if (!SessionService.getToken() || !SessionService.getUser()) {
+        SessionService.clear();
+        return;
+    }
+
+    try {
+        if (SessionService.isAdmin()) {
+            await AuthService.adminProfile();
+        } else {
+            const response = await API.get('/client/perfil', { skipAuthHandler: true });
+            SessionService.updateUser(envelopeData(response));
+        }
+    } catch (error) {
+        const status = error.response?.status;
+        if (status === 401 || status === 403) {
+            SessionService.clear();
+            SessionService.setFlash('Tu sesión expiró o ya no es válida. Inicia sesión nuevamente.', 'warning');
+>>>>>>> origin/main
             return;
         }
         console.error('No se pudo verificar la sesión con la API.', error);

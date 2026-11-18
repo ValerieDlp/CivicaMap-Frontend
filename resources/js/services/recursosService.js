@@ -81,16 +81,36 @@ const requestData = async (request) => {
     }
 };
 
+<<<<<<< HEAD
 export const RecursosService = {
     async getRecursos() {
         return requestData(apiClient.get('/reportes'));
     },
 
     async getRecursoById(id) {
+=======
+// scope "admin" consume el área protegida (/admin/...), cualquier otro valor la lectura pública.
+const basePath = (scope) => (scope === 'admin' ? '/admin' : '');
+
+export const RecursosService = {
+    async getRecursos(scope = 'public') {
+        return requestData(apiClient.get(`${basePath(scope)}/reportes`));
+    },
+
+    async getRecursoById(id, scope = 'public') {
+>>>>>>> origin/main
         if (id === undefined || id === null || id === '') {
             throw new TypeError('Se requiere el identificador del reporte.');
         }
 
+<<<<<<< HEAD
         return requestData(apiClient.get(`/reportes/${encodeURIComponent(id)}`));
+=======
+        return requestData(apiClient.get(`${basePath(scope)}/reportes/${encodeURIComponent(id)}`));
+    },
+
+    async getCategorias(scope = 'public') {
+        return requestData(apiClient.get(`${basePath(scope)}/categorias`));
+>>>>>>> origin/main
     },
 };
